@@ -10,6 +10,7 @@ _LOGGER = logging.getLogger(__name__)
 
 API_URL = "https://airquality.googleapis.com/v1/currentConditions:lookup"
 FORECAST_URL = "https://airquality.googleapis.com/v1/forecast:lookup"
+SCAN_INTERVAL = timedelta(hours=3)
 
 
 class GoogleAQIAirQualityEntity(AirQualityEntity):
