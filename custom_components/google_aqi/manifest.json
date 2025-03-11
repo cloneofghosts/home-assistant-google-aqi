@@ -1,15 +1,13 @@
 {
     "domain": "google_aqi",
     "name": "Google AQI",
-    "documentation": "https://github.com/bairnhard/google_aqi",
-    "issue_tracker": "https://github.com/bairnhard/google_aqi/issues",
-    "dependencies": [],
-    "requirements": [],
-    "version": "1.0.0",
-    "codeowners": [
-        "@bairnhard"
-    ],
-    "iot_class": "cloud_polling",
+    "codeowners": ["@bairnhard"],
     "config_flow": true,
-    "integration_type": "service"
+    "dependencies": [],
+    "documentation": "https://github.com/bairnhard/google_aqi",
+    "integration_type": "service",
+    "iot_class": "cloud_polling",
+    "issue_tracker": "https://github.com/bairnhard/google_aqi/issues",
+    "requirements": [],
+    "version": "1.0.0"    
 }
