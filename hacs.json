@@ -1,7 +1,5 @@
 {
     "name": "Google AQI",
     "content_in_root": false,
-    "render_readme": true,
-    "iot_class": "Cloud Polling",
-    "logo": "Google_AQI_Logo.png"
+    "render_readme": true
 }
