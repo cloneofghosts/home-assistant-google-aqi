@@ -1,24 +1,35 @@
 {
-    "title": "Google AQI",
-    "config": {
-      "step": {
-        "user": {
-          "title": "Google AQI Configuration",
-          "description": "Enter the configuration details for Google AQI.",
-          "data": {
-            "api_key": "API Key",
-            "latitude": "Latitude",
-            "longitude": "Longitude",
-            "interval": "Update Interval (minutes)",
-            "forecast_interval": "Forecast Interval (hours)",
-            "forecast_length": "Forecast Length (hours)"
-          }
+  "title": "Google AQI",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Google AQI Configuration",
+        "description": "Enter the configuration details for Google AQI.",
+        "data": {
+          "api_key": "API Key",
+          "latitude": "Latitude",
+          "longitude": "Longitude",
+          "interval": "Update Interval (minutes)",
+          "forecast_interval": "Forecast Interval (hours)",
+          "forecast_length": "Forecast Length (hours)"
         }
-      },
-      "error": {
-        "max_length_96": "Forecast length cannot exceed 96 hours.",
-        "invalid_interval": "Interval must be between 1 and 24 hours."
+      }
+    },
+    "error": {
+      "max_length_96": "Forecast length cannot exceed 96 hours.",
+      "invalid_interval": "Interval must be between 1 and 24 hours."
+    }
+  },
+  "services": {
+    "refresh_aqi_data": {
+      "name": "Refresh AQI Data",
+      "description": "Manually refresh the AQI data from the Google API.",
+      "fields": {
+        "force": {
+          "name": "Force Refresh",
+          "description": "Force a refresh, even if the update interval hasn't passed."
+        }
       }
     }
   }
-  
+}

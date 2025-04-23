@@ -1,24 +1,36 @@
 {
-    "title": "Google AQI",
-    "config": {
-      "step": {
-        "user": {
-          "title": "Google AQI Konfiguration",
-          "description": "Geben Sie die Konfigurationsdetails für Google AQI ein.",
-          "data": {
-            "api_key": "API Key",
-            "latitude": "Breitengrad",
-            "longitude": "Längengrad",
-            "interval": "Aktualisierungsintervall (Stunden)",
-            "forecast_interval": "Prognoseintervall (Stunden)",
-            "forecast_length": "Prognoselänge (Stunden)"
-          }
+  "title": "Google AQI",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Google AQI Konfiguration",
+        "description": "Gib die Konfigurationsdetails für Google AQI ein.",
+        "data": {
+          "api_key": "API-Key",
+          "latitude": "Breitengrad",
+          "longitude": "Längengrad",
+          "interval": "Aktualisierungsintervall (Minuten)",
+          "forecast_interval": "Prognoseintervall (Stunden)",
+          "forecast_length": "Prognoselänge (Stunden)",
+          "get_additional_info": "Zusätzliche Informationen einbeziehen"
         }
-      },
-      "error": {
-        "max_length_96": "Die Prognoselänge darf 96 Stunden nicht überschreiten.",
-        "invalid_interval": "Das Intervall muss zwischen 1 und 24 Stunden liegen."
+      }
+    },
+    "error": {
+      "max_length_96": "Die Prognoselänge darf 96 Stunden nicht überschreiten.",
+      "invalid_interval": "Das Intervall muss zwischen 1 und 24 Stunden liegen."
+    }
+  },
+  "services": {
+    "refresh_aqi_data": {
+      "name": "AQI-Daten aktualisieren",
+      "description": "Manuelles Abrufen der aktuellen AQI-Daten.",
+      "fields": {
+        "force": {
+          "name": "Erneut erzwingen",
+          "description": "Erzwingt eine Aktualisierung, auch wenn das Intervall noch nicht abgelaufen ist."
+        }
       }
     }
   }
-  
+}

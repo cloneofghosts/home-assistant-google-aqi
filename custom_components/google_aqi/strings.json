@@ -19,17 +19,5 @@
       "max_length_96": "Forecast length must not exceed 96 hours.",
       "invalid_interval": "Interval must be between 1 and 24 hours."
     }
-  },
-  "services": {
-    "refresh_aqi_data": {
-      "name": "Refresh AQI Data",
-      "description": "Manually refresh the AQI data from the Google API.",
-      "fields": {
-        "force": {
-          "name": "Force Refresh",
-          "description": "Force a refresh, even if the update interval hasn't passed."
-        }
-      }
-    }
   }
 }
