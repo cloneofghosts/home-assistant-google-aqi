@@ -5,8 +5,7 @@
         "@bairnhard"
     ],
     "config_flow": true,
-    "dependencies": [],
-    "description": "Monitors Air Quality Index (AQI) using Google services.",
+    "dependencies": [],    
     "documentation": "https://github.com/bairnhard/google_aqi",
     "integration_type": "service",
     "iot_class": "cloud_polling",

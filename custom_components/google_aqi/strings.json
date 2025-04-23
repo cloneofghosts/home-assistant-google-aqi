@@ -23,7 +23,7 @@
   "services": {
     "refresh_aqi_data": {
       "name": "Refresh AQI Data",
-      "description": "Manually refresh the AQI data from Google Air Quality API.",
+      "description": "Manually refresh the AQI data from the Google API.",
       "fields": {
         "force": {
           "name": "Force Refresh",
