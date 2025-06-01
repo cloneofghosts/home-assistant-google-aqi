@@ -21,12 +21,12 @@ Pull requests are the best way to propose changes to the codebase.
 
 ## Any contributions you make will be under the Apache-2.0 License
 
-In short, when you submit code changes, your submissions are understood to be under the same [Apache-2.0](https://github.com/Pirate-Weather/pirate-weather-ha?tab=Apache-2.0-1-ov-file#readme) that covers the project. Feel free to contact the maintainers if that's a concern.
+In short, when you submit code changes, your submissions are understood to be under the same [Apache-2.0](https://github.com/bairnhard/home-assistant-google-aqi?tab=Apache-2.0-1-ov-file#) that covers the project. Feel free to contact the maintainers if that's a concern.
 
-## Report bugs using Github's [issues](https://github.com/Pirate-Weather/pirate-weather-ha/issues)
+## Report bugs using Github's [issues](https://github.com/bairnhard/home-assistant-google-aqi/issues/)
 
 GitHub issues are used to track public bugs.
-Report a bug by [opening a new issue](https://github.com/Pirate-Weather/pirate-weather-ha/issues/new/choose); it's that easy!
+Report a bug by [opening a new issue](https://github.com/bairnhard/home-assistant-google-aqi/issues/new/choose); it's that easy!
 
 ## Write bug reports with detail, background, and sample code
 
