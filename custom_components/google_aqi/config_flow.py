@@ -1,5 +1,7 @@
-from homeassistant import config_entries
+"""The Google Weather AQI config flow."""
+
 import voluptuous as vol
+from homeassistant import config_entries
 
 DOMAIN = "google_aqi"  # Define the domain here
 

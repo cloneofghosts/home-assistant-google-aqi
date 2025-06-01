@@ -1,10 +1,13 @@
+"""The Google Weather AQI sensors."""
+
+import asyncio
+import logging
+from datetime import UTC, datetime, timedelta
+
 from homeassistant.components.air_quality import AirQualityEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from datetime import datetime, timedelta, timezone
-import logging
-import asyncio
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -27,6 +30,7 @@ class GoogleAQIAirQualityEntity(AirQualityEntity):
         forecast_interval,
         forecast_length,
     ):
+        """Initialize the sensor."""
         self.hass = hass
         self._api_key = api_key
         self._latitude = latitude
@@ -152,7 +156,7 @@ class GoogleAQIAirQualityEntity(AirQualityEntity):
         """Determine whether a forecast update is needed."""
         if not self._last_forecast_update:
             return True
-        elapsed_time = datetime.now(timezone.utc) - self._last_forecast_update
+        elapsed_time = datetime.now(UTC) - self._last_forecast_update
         return elapsed_time > timedelta(hours=self._forecast_interval)
 
     async def _fetch_current_data(self):
@@ -170,16 +174,18 @@ class GoogleAQIAirQualityEntity(AirQualityEntity):
                     self._forecast_api_status = "successful"
                 else:
                     _LOGGER.error(
-                        f"Failed to fetch current AQI data: {response.status} - {await response.text()}"
+                        "Failed to fetch current AQI data: %s - %s",
+                        response.status,
+                        await response.text(),
                     )
-        except Exception as e:
-            _LOGGER.error(f"Error fetching current AQI data: {e}")
+        except Exception as e:  # noqa: BLE001
+            _LOGGER.error("Error fetching current AQI data: %s", e)
             self._current_api_status = "error"
 
     async def _fetch_forecast_data(self):
         """Fetch forecast data with correct start and end time calculation."""
         self._last_forecast_api_call = datetime.now()
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         # Align `startTime` with the next full hour
         next_full_hour = (now + timedelta(hours=1)).replace(
             minute=0, second=0, microsecond=0
@@ -214,16 +220,18 @@ class GoogleAQIAirQualityEntity(AirQualityEntity):
                 if response.status == 200:
                     data = await response.json()
                     self._process_forecast_data(data)
-                    self._last_forecast_update = datetime.now(timezone.utc)
+                    self._last_forecast_update = datetime.now(UTC)
                     self._forecast_api_status = "successful"
                 else:
                     error_text = await response.text()
                     _LOGGER.error(
-                        f"Failed to fetch forecast data: {response.status} - {error_text}"
+                        "Failed to fetch forecast data: %s - %s",
+                        response.status,
+                        error_text,
                     )
                     self._forecast_api_status = "error"
-        except Exception as e:
-            _LOGGER.error(f"Error fetching forecast data: {e}")
+        except Exception as e:  # noqa: BLE001
+            _LOGGER.error("Error fetching forecast data: %s", e)
             self._forecast_api_status = "error"
 
     def _process_forecast_data(self, data):
@@ -327,7 +335,7 @@ class GoogleAQIAirQualityEntity(AirQualityEntity):
 
     def _create_forecast_payload(self):
         """Create the payload for the forecast API call."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         end_time = now + timedelta(hours=self._forecast_length)
         return {
             "location": {"latitude": self._latitude, "longitude": self._longitude},

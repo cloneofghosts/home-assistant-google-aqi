@@ -1,0 +1,12 @@
+__pycache__
+pythonenv*
+venv
+.venv
+.coverage
+*.db*
+*.log*
+.HA_VERSION
+config/.storage/*
+config/blueprints/*
+.ruff_cache
+config/deps/*
