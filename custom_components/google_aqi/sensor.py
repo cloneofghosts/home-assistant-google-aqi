@@ -1,3 +1,5 @@
+"""The Google AQI sensors."""
+
 from __future__ import annotations
 
 import logging
@@ -24,6 +26,8 @@ POLLUTANTS = {
 
 
 class GoogleAQIPollutantSensor(SensorEntity):
+    """The Google AQI pollutant sensor."""
+
     def __init__(
         self,
         coordinator: GoogleAQIDataCoordinator,
@@ -32,6 +36,7 @@ class GoogleAQIPollutantSensor(SensorEntity):
         unit: str,
         icon: str,
     ) -> None:
+        """Initialize the AQI pollutant sensor."""
         self.coordinator = coordinator
         self._attr_name = f"Google AQI {name}"
         self._attr_icon = icon
@@ -42,10 +47,12 @@ class GoogleAQIPollutantSensor(SensorEntity):
 
     @property
     def native_value(self) -> StateType:
+        """Return the current pollutant value."""
         return self.coordinator.pollutants.get(self._code, {}).get("value")
 
     @property
     def extra_state_attributes(self) -> dict[str, str | None]:
+        """Return extra information about the pollutant."""
         data = self.coordinator.pollutants.get(self._code, {})
         return {
             "sources": data.get("sources"),
@@ -53,17 +60,21 @@ class GoogleAQIPollutantSensor(SensorEntity):
         }
 
     async def async_update(self) -> None:
+        """Asynchronously update the pollutant sensor."""
         await self.coordinator.async_request_refresh()
         self.async_write_ha_state()
 
 
 class GoogleAQIIndexSensor(SensorEntity):
+    """The Google AQI index sensor."""
+
     def __init__(
         self,
         coordinator: GoogleAQIDataCoordinator,
         code: str,
         name: str,
     ) -> None:
+        """Initialize the AQI index sensor."""
         self.coordinator = coordinator
         self._attr_name = f"Google AQI {name}"
         self._attr_icon = "mdi:gauge"
@@ -73,6 +84,7 @@ class GoogleAQIIndexSensor(SensorEntity):
 
     @property
     def native_value(self) -> StateType:
+        """Initialize the AQI pollutant sensor."""
         for index in self.coordinator.indexes:
             if index.get("code") == self._code:
                 return index.get("aqi")
@@ -80,6 +92,7 @@ class GoogleAQIIndexSensor(SensorEntity):
 
     @property
     def extra_state_attributes(self) -> dict[str, str | None]:
+        """Return the AQI value from the index."""
         for index in self.coordinator.indexes:
             if index.get("code") == self._code:
                 return {
@@ -89,12 +102,16 @@ class GoogleAQIIndexSensor(SensorEntity):
         return {}
 
     async def async_update(self) -> None:
+        """Asynchronously update the AQI index sensor."""
         await self.coordinator.async_request_refresh()
         self.async_write_ha_state()
 
 
 class GoogleAQIForecastSensor(SensorEntity):
+    """The Google AQI forecast sensor."""
+
     def __init__(self, coordinator: GoogleAQIDataCoordinator) -> None:
+        """Initialize the Google AQI forecast sensor."""
         self.coordinator = coordinator
         self._attr_name = "Google AQI Forecast"
         self._attr_icon = "mdi:chart-line"
@@ -103,17 +120,20 @@ class GoogleAQIForecastSensor(SensorEntity):
 
     @property
     def native_value(self) -> StateType:
+        """Return the first AQI index as the native value."""
         if self.coordinator.forecast_data:
             return self.coordinator.forecast_data[0].get("aqi")
         return None
 
     @property
     def extra_state_attributes(self) -> dict[str, str | list]:
+        """Return the rest of the forecast as extra state attributes."""
         return {
             "forecast": self.coordinator.forecast_data,
         }
 
     async def async_update(self) -> None:
+        """Asynchronously update the AQI forecast sensor."""
         await self.coordinator.async_update_forecast()
         self.async_write_ha_state()
 
@@ -123,6 +143,8 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
+    """Set up the Google AQI sensors."""
+
     coordinator: GoogleAQIDataCoordinator = hass.data[DOMAIN][entry.entry_id]
     entities: list[SensorEntity] = []
 

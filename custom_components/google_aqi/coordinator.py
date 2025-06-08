@@ -1,3 +1,5 @@
+"""The Google AQI coordinator."""
+
 from __future__ import annotations
 
 import logging
@@ -13,6 +15,8 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class GoogleAQIDataCoordinator(DataUpdateCoordinator):
+    """The Google AQI data coordinator."""
+
     def __init__(
         self,
         hass: HomeAssistant,
@@ -80,7 +84,7 @@ class GoogleAQIDataCoordinator(DataUpdateCoordinator):
             async with session.post(API_URL, json=payload, params=params) as response:
                 if response.status != 200:
                     text = await response.text()
-                    raise UpdateFailed(f"API response {response.status}: {text}")
+                    _raise_update_failed(response.status, text)
 
                 data = await response.json()
 
@@ -186,5 +190,10 @@ class GoogleAQIDataCoordinator(DataUpdateCoordinator):
                     self._forecast_data = forecast
                     self._last_forecast_update = now
 
-            except Exception as err:
+            except Exception as err:  # noqa: BLE001
                 _LOGGER.error("Error fetching forecast data: %s", err)
+
+
+def _raise_update_failed(status: int, text: str) -> None:
+    """Return UpdateFailed if the data could not be fetched."""
+    raise UpdateFailed(f"API response {status}: {text}")

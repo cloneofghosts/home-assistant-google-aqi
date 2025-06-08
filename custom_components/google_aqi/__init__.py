@@ -18,6 +18,8 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Set up the Google AQI entity."""
+
     _LOGGER.info("Setting up Google AQI integration with config: %s", entry.data)
 
     if not entry.options:
@@ -65,4 +67,5 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def async_get_options_flow(config_entry: ConfigEntry):
+    """Set up the Google AQI options flow."""
     return GoogleAQIOptionsFlowHandler(config_entry)
