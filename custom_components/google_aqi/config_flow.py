@@ -19,11 +19,11 @@ class GoogleAQIConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     data_schema=self._get_form_schema(),
                     errors={"forecast_length": "max_length_96"},
                 )
-            if user_input["interval"] > 24 or user_input["interval"] < 1:
+            if user_input["update_interval"] > 24 or user_input["update_interval"] < 1:
                 return self.async_show_form(
                     step_id="user",
                     data_schema=self._get_form_schema(),
-                    errors={"interval": "invalid_interval"},
+                    errors={"update_interval": "invalid_interval"},
                 )
             if (
                 user_input["forecast_interval"] > 24
@@ -55,7 +55,7 @@ class GoogleAQIConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required("api_key"): str,  # API key must be entered by the user
                 vol.Optional("latitude", default=default_latitude): float,
                 vol.Optional("longitude", default=default_longitude): float,
-                vol.Optional("interval", default=1): vol.All(
+                vol.Optional("update_interval", default=1): vol.All(
                     int, vol.Range(min=1, max=24)
                 ),
                 vol.Optional("forecast_interval", default=6): vol.All(
@@ -67,3 +67,46 @@ class GoogleAQIConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Optional("get_additional_info", default=False): bool,
             }
         )
+
+
+class GoogleAQIOptionsFlowHandler(config_entries.OptionsFlow):
+    """Handle options flow for Google AQI."""
+
+    def __init__(self, config_entry: config_entries.ConfigEntry):
+        self.config_entry = config_entry
+
+    async def async_step_init(self, user_input=None):
+        """Manage the options."""
+        if user_input is not None:
+            return self.async_create_entry(title="", data=user_input)
+
+        data = self.config_entry.options or self.config_entry.data
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Optional("latitude", default=data.get("latitude", 0.0)): float,
+                    vol.Optional(
+                        "longitude", default=data.get("longitude", 0.0)
+                    ): float,
+                    vol.Optional("interval", default=data.get("interval", 1)): vol.All(
+                        int, vol.Range(min=1, max=24)
+                    ),
+                    vol.Optional(
+                        "forecast_interval", default=data.get("forecast_interval", 6)
+                    ): vol.All(int, vol.Range(min=1, max=24)),
+                    vol.Optional(
+                        "forecast_length", default=data.get("forecast_length", 48)
+                    ): vol.All(int, vol.Range(min=1, max=96)),
+                    vol.Optional(
+                        "get_additional_info",
+                        default=data.get("get_additional_info", False),
+                    ): bool,
+                }
+            ),
+        )
+
+
+# Link it to the flow
+async def async_get_options_flow(config_entry):
+    return GoogleAQIOptionsFlowHandler(config_entry)

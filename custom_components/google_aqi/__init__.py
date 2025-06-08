@@ -5,7 +5,9 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers.typing import ConfigType
+
+from .config_flow import GoogleAQIOptionsFlowHandler
+from .coordinator import GoogleAQIDataCoordinator
 
 DOMAIN = "google_aqi"
 PLATFORMS = ["sensor"]
@@ -15,35 +17,52 @@ CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
-    """Set up the Google AQI component from configuration.yaml (not used in this case)."""
-    hass.data.setdefault(DOMAIN, {})
-    return True
-
-
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up the Google AQI component from a config entry."""
     _LOGGER.info("Setting up Google AQI integration with config: %s", entry.data)
 
-    # Store the configuration data in hass.data for later use
-    hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.entry_id] = entry.data
+    if not entry.options:
+        hass.config_entries.async_update_entry(entry, options=entry.data)
 
-    # Forward the entry to the sensor platform
-    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    data = entry.options or entry.data
+
+    # Extract config values from entry.data
+    api_key = data.get("api_key")
+    latitude = data.get("latitude")
+    longitude = data.get("longitude")
+    update_interval = data.get("update_interval", 1)  # default 1 hour
+    forecast_interval = data.get("forecast_interval", 3)  # default 3 hours
+    forecast_length = data.get("forecast_length", 24)  # default 24 hours
+
+    coordinator = GoogleAQIDataCoordinator(
+        hass,
+        api_key,
+        latitude,
+        longitude,
+        update_interval,
+        forecast_interval,
+        forecast_length,
+    )
+
+    # Perform initial data fetch
+    await coordinator.async_config_entry_first_refresh()
+
+    # Save coordinator instance in hass.data
+    hass.data.setdefault(DOMAIN, {})
+    hass.data[DOMAIN][entry.entry_id] = coordinator
+
+    # Forward setup to sensor platform
+    await hass.config_entries.async_forward_entry_setups(entry, ["sensor"])
 
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    _LOGGER.info("Unloading Google AQI integration for entry: %s", entry.entry_id)
-
-    # Unload the platform
-    unload_ok = await hass.config_entries.async_forward_entry_unload(entry, "sensor")
-
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unload_ok:
-        # Remove the configuration from hass.data
-        hass.data[DOMAIN].pop(entry.entry_id, None)
-
+        hass.data[DOMAIN].pop(entry.entry_id)
     return unload_ok
+
+
+async def async_get_options_flow(config_entry: ConfigEntry):
+    return GoogleAQIOptionsFlowHandler(config_entry)
