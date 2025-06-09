@@ -28,7 +28,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     data = entry.options or entry.data
 
     # Extract config values from entry.data
-    api_key = data.get("api_key")
+    api_key = entry.data.get("api_key")
     latitude = data.get("latitude")
     longitude = data.get("longitude")
     update_interval = data.get("update_interval", 1)  # default 1 hour
@@ -55,6 +55,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Forward setup to sensor platform
     await hass.config_entries.async_forward_entry_setups(entry, ["sensor"])
 
+    # Reload the integration after changing configuration
+    entry.async_on_unload(entry.add_update_listener(update_listener))
+
     return True
 
 
@@ -69,3 +72,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def async_get_options_flow(config_entry: ConfigEntry):
     """Set up the Google AQI options flow."""
     return GoogleAQIOptionsFlowHandler(config_entry)
+
+
+async def update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Handle options update: reload the integration to apply changes."""
+    await hass.config_entries.async_reload(entry.entry_id)

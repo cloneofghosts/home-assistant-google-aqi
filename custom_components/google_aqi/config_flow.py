@@ -9,6 +9,11 @@ DOMAIN = "google_aqi"  # Define the domain here
 class GoogleAQIConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Google AQI."""
 
+    @classmethod
+    def async_get_options_flow(cls, config_entry):
+        """Get the options flow asynchronously."""
+        return GoogleAQIOptionsFlowHandler(config_entry)
+
     async def async_step_user(self, user_input=None):
         """Handle the initial step where the user configures the integration."""
         if user_input is not None:
@@ -106,9 +111,3 @@ class GoogleAQIOptionsFlowHandler(config_entries.OptionsFlow):
                 }
             ),
         )
-
-
-# Link it to the flow
-async def async_get_options_flow(config_entry):
-    """Get the options flow asynchronously."""
-    return GoogleAQIOptionsFlowHandler(config_entry)
