@@ -42,7 +42,7 @@ class GoogleAQIPollutantSensor(SensorEntity):
         self._attr_icon = icon
         self._attr_native_unit_of_measurement = unit
         self._code = code
-        self._attr_should_poll = False
+        self._attr_should_poll = True
         self._attr_unique_id = f"google_aqi_pollutant_{code}"
 
     @property
@@ -53,6 +53,8 @@ class GoogleAQIPollutantSensor(SensorEntity):
     @property
     def extra_state_attributes(self) -> dict[str, str | None]:
         """Return extra information about the pollutant."""
+        if not getattr(self.coordinator, "get_additional_info", False):
+            return {}
         data = self.coordinator.pollutants.get(self._code, {})
         return {
             "sources": data.get("sources"),
@@ -78,13 +80,14 @@ class GoogleAQIIndexSensor(SensorEntity):
         self.coordinator = coordinator
         self._attr_name = f"Google AQI {name}"
         self._attr_icon = "mdi:gauge"
-        self._attr_should_poll = False
+        self._attr_should_poll = True
         self._attr_unique_id = f"google_aqi_index_{code}"
         self._code = code
 
     @property
     def native_value(self) -> StateType:
         """Initialize the AQI pollutant sensor."""
+        _LOGGER.debug("Forecast data received: %s", self.coordinator.forecast_data)
         for index in self.coordinator.indexes:
             if index.get("code") == self._code:
                 return index.get("aqi")
@@ -93,6 +96,9 @@ class GoogleAQIIndexSensor(SensorEntity):
     @property
     def extra_state_attributes(self) -> dict[str, str | None]:
         """Return the AQI value from the index."""
+        if not getattr(self.coordinator, "get_additional_info", False):
+            return {}
+
         for index in self.coordinator.indexes:
             if index.get("code") == self._code:
                 return {
@@ -115,7 +121,7 @@ class GoogleAQIForecastSensor(SensorEntity):
         self.coordinator = coordinator
         self._attr_name = "Google AQI Forecast"
         self._attr_icon = "mdi:chart-line"
-        self._attr_should_poll = False
+        self._attr_should_poll = True
         self._attr_unique_id = "google_aqi_forecast"
 
     @property

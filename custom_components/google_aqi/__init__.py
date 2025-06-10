@@ -20,12 +20,12 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up the Google AQI entity."""
 
-    _LOGGER.info("Setting up Google AQI integration with config: %s", entry.data)
-
     if not entry.options:
         hass.config_entries.async_update_entry(entry, options=entry.data)
 
     data = entry.options or entry.data
+
+    _LOGGER.debug("Setting up Google AQI integration with config: %s", data)
 
     # Extract config values from entry.data
     api_key = entry.data.get("api_key")
@@ -34,6 +34,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     update_interval = data.get("update_interval", 1)  # default 1 hour
     forecast_interval = data.get("forecast_interval", 3)  # default 3 hours
     forecast_length = data.get("forecast_length", 24)  # default 24 hours
+    get_additional_info = entry.options.get("get_additional_info", False)
 
     coordinator = GoogleAQIDataCoordinator(
         hass,
@@ -43,6 +44,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         update_interval,
         forecast_interval,
         forecast_length,
+        get_additional_info,
     )
 
     # Perform initial data fetch

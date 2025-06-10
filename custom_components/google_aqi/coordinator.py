@@ -26,6 +26,7 @@ class GoogleAQIDataCoordinator(DataUpdateCoordinator):
         update_interval: int,
         forecast_interval: int,
         forecast_length: int,
+        get_additional_info: bool,
     ) -> None:
         """Initialize coordinator."""
         super().__init__(
@@ -39,6 +40,7 @@ class GoogleAQIDataCoordinator(DataUpdateCoordinator):
         self._longitude = longitude
         self._forecast_interval = forecast_interval
         self._forecast_length = forecast_length
+        self.get_additional_info = get_additional_info
 
         self._pollutants: dict = {}
         self._indexes: list = []
@@ -114,6 +116,7 @@ class GoogleAQIDataCoordinator(DataUpdateCoordinator):
     async def async_update_forecast(self) -> None:
         """Fetch and update forecast data, respecting forecast_interval."""
         now = datetime.now(UTC)
+        _LOGGER.debug("Updating forecast data...")
         if self._last_forecast_update is None or (
             now - self._last_forecast_update
         ) >= timedelta(hours=self._forecast_interval):
@@ -188,6 +191,7 @@ class GoogleAQIDataCoordinator(DataUpdateCoordinator):
                         )
 
                     self._forecast_data = forecast
+                    _LOGGER.debug("Raw forecast data fetched: %s", forecast)
                     self._last_forecast_update = now
 
             except Exception as err:  # noqa: BLE001

@@ -5,11 +5,11 @@
         "@bairnhard"
     ],
     "config_flow": true,
-    "dependencies": [],    
+    "dependencies": [],
     "documentation": "https://github.com/bairnhard/home-assistant-google-aqi",
     "integration_type": "service",
     "iot_class": "cloud_polling",
     "issue_tracker": "https://github.com/bairnhard/home-assistant-google-aqi/issues",
     "requirements": [],
-    "version": "1.0.0"
+    "version": "1.1.0"
 }

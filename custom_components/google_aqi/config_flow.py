@@ -1,5 +1,6 @@
 """The Google Weather AQI config flow."""
 
+import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant import config_entries
 
@@ -58,9 +59,9 @@ class GoogleAQIConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return vol.Schema(
             {
                 vol.Required("api_key"): str,  # API key must be entered by the user
-                vol.Optional("latitude", default=default_latitude): float,
-                vol.Optional("longitude", default=default_longitude): float,
-                vol.Optional("update_interval", default=1): vol.All(
+                vol.Optional("latitude", default=default_latitude): cv.latitude,
+                vol.Optional("longitude", default=default_longitude): cv.longitude,
+                vol.Optional("update_interval", default=3): vol.All(
                     int, vol.Range(min=1, max=24)
                 ),
                 vol.Optional("forecast_interval", default=6): vol.All(
@@ -91,11 +92,13 @@ class GoogleAQIOptionsFlowHandler(config_entries.OptionsFlow):
             step_id="init",
             data_schema=vol.Schema(
                 {
-                    vol.Optional("latitude", default=data.get("latitude", 0.0)): float,
+                    vol.Optional(
+                        "latitude", default=data.get("latitude", 0.0)
+                    ): cv.latitude,
                     vol.Optional(
                         "longitude", default=data.get("longitude", 0.0)
-                    ): float,
-                    vol.Optional("interval", default=data.get("interval", 1)): vol.All(
+                    ): cv.longitude,
+                    vol.Optional("interval", default=data.get("interval", 3)): vol.All(
                         int, vol.Range(min=1, max=24)
                     ),
                     vol.Optional(
