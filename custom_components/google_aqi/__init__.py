@@ -7,7 +7,10 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 
 from .config_flow import GoogleAQIOptionsFlowHandler
-from .coordinator import GoogleAQIDataCoordinator
+from .coordinator import (
+    GoogleAQIDataCoordinator,
+    GoogleAQIForecastCoordinator,
+)
 
 DOMAIN = "google_aqi"
 PLATFORMS = ["sensor"]
@@ -27,16 +30,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     _LOGGER.debug("Setting up Google AQI integration with config: %s", data)
 
-    # Extract config values from entry.data
+    # Extract config values
     api_key = entry.data.get("api_key")
     latitude = data.get("latitude")
     longitude = data.get("longitude")
-    update_interval = data.get("update_interval", 1)  # default 1 hour
-    forecast_interval = data.get("forecast_interval", 3)  # default 3 hours
-    forecast_length = data.get("forecast_length", 24)  # default 24 hours
-    get_additional_info = entry.options.get("get_additional_info", False)
+    update_interval = data.get("update_interval", 1)
+    forecast_interval = data.get("forecast_interval", 3)
+    forecast_length = data.get("forecast_length", 24)
+    get_additional_info = data.get("get_additional_info", False)
 
-    coordinator = GoogleAQIDataCoordinator(
+    # Instantiate both coordinators
+    aqi_coordinator = GoogleAQIDataCoordinator(
         hass,
         api_key,
         latitude,
@@ -47,17 +51,28 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         get_additional_info,
     )
 
-    # Perform initial data fetch
-    await coordinator.async_config_entry_first_refresh()
+    forecast_coordinator = GoogleAQIForecastCoordinator(
+        hass,
+        api_key,
+        latitude,
+        longitude,
+        forecast_interval,
+        forecast_length,
+    )
 
-    # Save coordinator instance in hass.data
+    # Initial data fetch
+    await aqi_coordinator.async_config_entry_first_refresh()
+    await forecast_coordinator.async_config_entry_first_refresh()
+
+    # Store both coordinators
     hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.entry_id] = coordinator
+    hass.data[DOMAIN][entry.entry_id] = {
+        "aqi": aqi_coordinator,
+        "forecast": forecast_coordinator,
+    }
 
-    # Forward setup to sensor platform
-    await hass.config_entries.async_forward_entry_setups(entry, ["sensor"])
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-    # Reload the integration after changing configuration
     entry.async_on_unload(entry.add_update_listener(update_listener))
 
     return True
