@@ -65,8 +65,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await forecast_coordinator.async_config_entry_first_refresh()
 
     _LOGGER.debug("AQI coordinator timer: %s", aqi_coordinator.update_interval)
-    _LOGGER.debug("Forecast coordinator timer: %s", forecast_coordinator.update_interval)
-
+    _LOGGER.debug(
+        "Forecast coordinator timer: %s", forecast_coordinator.update_interval
+    )
 
     # Store both coordinators
     hass.data.setdefault(DOMAIN, {})
