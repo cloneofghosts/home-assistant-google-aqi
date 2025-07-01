@@ -4,11 +4,16 @@ from __future__ import annotations
 
 import logging
 
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorStateClass,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN
 from .coordinator import GoogleAQIDataCoordinator, GoogleAQIForecastCoordinator
@@ -25,25 +30,29 @@ POLLUTANTS = {
 }
 
 
-class GoogleAQIPollutantSensor(SensorEntity):
+class GoogleAQIPollutantSensor(CoordinatorEntity, SensorEntity):
     """The Google AQI pollutant sensor."""
 
     def __init__(
         self,
         coordinator: GoogleAQIDataCoordinator,
+        entry_id: str,
         code: str,
         name: str,
         unit: str,
         icon: str,
     ) -> None:
         """Initialize the AQI pollutant sensor."""
+        super().__init__(coordinator)
         self.coordinator = coordinator
         self._attr_name = f"Google AQI {name}"
         self._attr_icon = icon
         self._attr_native_unit_of_measurement = unit
-        self._code = code
+        self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_device_class = None
         self._attr_should_poll = False
-        self._attr_unique_id = f"google_aqi_pollutant_{code}"
+        self._attr_unique_id = f"google_aqi_pollutant_{entry_id}_{code}"
+        self._code = code
 
     @property
     def native_value(self) -> StateType:
@@ -62,26 +71,30 @@ class GoogleAQIPollutantSensor(SensorEntity):
         }
 
 
-class GoogleAQIIndexSensor(SensorEntity):
+class GoogleAQIIndexSensor(CoordinatorEntity, SensorEntity):
     """The Google AQI index sensor."""
 
     def __init__(
         self,
         coordinator: GoogleAQIDataCoordinator,
+        entry_id: str,
         code: str,
         name: str,
     ) -> None:
         """Initialize the AQI index sensor."""
+        super().__init__(coordinator)
         self.coordinator = coordinator
         self._attr_name = f"Google AQI {name}"
         self._attr_icon = "mdi:gauge"
         self._attr_should_poll = False
-        self._attr_unique_id = f"google_aqi_index_{code}"
+        self._attr_unique_id = f"google_aqi_index_{entry_id}_{code}"
+        self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_device_class = SensorDeviceClass.AQI
         self._code = code
 
     @property
     def native_value(self) -> StateType:
-        """Initialize the AQI index sensor."""
+        """Return the AQI value."""
         for index in self.coordinator.indexes:
             if index.get("code") == self._code:
                 return index.get("aqi")
@@ -101,16 +114,19 @@ class GoogleAQIIndexSensor(SensorEntity):
         return {}
 
 
-class GoogleAQIForecastSensor(SensorEntity):
+class GoogleAQIForecastSensor(CoordinatorEntity, SensorEntity):
     """The Google AQI forecast sensor."""
 
-    def __init__(self, coordinator: GoogleAQIForecastCoordinator) -> None:
+    def __init__(
+        self, coordinator: GoogleAQIForecastCoordinator, entry_id: str
+    ) -> None:
         """Initialize the Google AQI forecast sensor."""
+        super().__init__(coordinator)
         self.coordinator = coordinator
         self._attr_name = "Google AQI Forecast"
         self._attr_icon = "mdi:chart-line"
         self._attr_should_poll = False
-        self._attr_unique_id = "google_aqi_forecast"
+        self._attr_unique_id = f"google_aqi_forecast_{entry_id}"
 
     @property
     def native_value(self) -> StateType:
@@ -143,7 +159,9 @@ async def async_setup_entry(
     # Pollutant sensors
     for code, (name, unit, icon) in POLLUTANTS.items():
         entities.append(
-            GoogleAQIPollutantSensor(aqi_coordinator, code, name, unit, icon)
+            GoogleAQIPollutantSensor(
+                aqi_coordinator, entry.entry_id, code, name, unit, icon
+            )
         )
 
     # AQI Index sensors
@@ -151,9 +169,11 @@ async def async_setup_entry(
         code = index.get("code")
         name = index.get("displayName", code.upper())
         if code:
-            entities.append(GoogleAQIIndexSensor(aqi_coordinator, code, name))
+            entities.append(
+                GoogleAQIIndexSensor(aqi_coordinator, entry.entry_id, code, name)
+            )
 
     # Forecast sensor using forecast coordinator
-    entities.append(GoogleAQIForecastSensor(forecast_coordinator))
+    entities.append(GoogleAQIForecastSensor(forecast_coordinator, entry.entry_id))
 
     async_add_entities(entities)

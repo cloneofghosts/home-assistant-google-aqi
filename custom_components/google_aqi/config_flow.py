@@ -75,12 +75,8 @@ class GoogleAQIConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
 
-class GoogleAQIOptionsFlowHandler(config_entries.OptionsFlow):
+class GoogleAQIOptionsFlowHandler(config_entries.OptionsFlowWithConfigEntry):
     """Handle options flow for Google AQI."""
-
-    def __init__(self, config_entry: config_entries.ConfigEntry):
-        """Initialize the Google AQI config flow."""
-        self.config_entry = config_entry
 
     async def async_step_init(self, user_input=None):
         """Manage the options."""
