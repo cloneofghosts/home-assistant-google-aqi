@@ -1,1 +1,5 @@
 blank_issues_enabled: false
+contact_links:
+  - name: Google AQI Issue Tracker
+    url: https://issuetracker.google.com/savedsearches/6534431?pli=1
+    about: Report any issues with the Google AQI API here.

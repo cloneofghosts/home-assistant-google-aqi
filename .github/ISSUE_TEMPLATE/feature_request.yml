@@ -6,6 +6,32 @@ body:
 - type: markdown
   attributes:
     value: Before you open a new feature request, search through the existing feature requests to see if others have had the same idea.
+
+- type: textarea
+  id: describe-the-feature
+  attributes:
+    label: Describe the feature
+  validations:
+    required: true
+
+- type: input
+  id: ha-version
+  attributes:
+    label: Home Assistant version
+    description: You can find your Home Assistant version in **Settings > About**.
+    placeholder: |
+      Example: "2025.7.2"
+  validations:
+    required: true
+
+- type: input
+  id: integration-version
+  attributes:
+    label: Integration version
+    description: You can find this by going to **HACS > Google AQI.** The number beside the box is the version of the integration you are running.
+    placeholder: |
+      Example: "1.1.0"
+
 - type: checkboxes
   attributes:
     label: Checklist
@@ -16,28 +42,6 @@ body:
         required: true
       - label: This issue is not a duplicate feature request of [previous feature requests](https://github.com/bairnhard/home-assistant-google-aqi/labels/enhancement).
         required: true
-
-- type: textarea
-  attributes:
-    label: "Is your feature request related to a problem? Please describe."
-    description: "A clear and concise description of what the problem is."
-    placeholder: "I'm always frustrated when [...]"
-  validations:
-    required: true
-
-- type: textarea
-  attributes:
-    label: "Describe the solution you'd like"
-    description: "A clear and concise description of what you want to happen."
-  validations:
-    required: true
-
-- type: textarea
-  attributes:
-    label: "Describe alternatives you've considered"
-    description: "A clear and concise description of any alternative solutions or features you've considered."
-  validations:
-    required: true
 
 - type: textarea
   attributes:
